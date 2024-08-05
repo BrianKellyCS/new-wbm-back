@@ -121,7 +121,8 @@ npm i
 5. Add following environmental variables to that file:
 
 ```
-DATABASE_URL=postgresql://postgres:[your-local-db-password]@localhost:[port]/[db-name]
+DATABASE_URL=postgresql://{username}:{password}@{hostname}:{port}/{database_name}
+
 JWT_SECRET_KEY={json web token secret key (may be a random string)}
 
 ```
