@@ -23,7 +23,7 @@ client.connect()
 const JWT_SECRET = process.env.JWT_SECRET;
 
 app.get('/', (req, res) => {
-  res.send('Hello World!');
+  res.send('Database up');
 });
 
 
@@ -185,6 +185,25 @@ app.get('/api/user-details/:userId', async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   });
+
+  // Update feedback by ID
+  app.put('/api/feedbacks/:id', async (req, res) => {
+    const { id } = req.params;
+    const updateData = req.body;
+
+    const query = {
+      text: `UPDATE feedbacks SET ${Object.keys(updateData).map((key, idx) => `${key} = $${idx + 1}`).join(', ')} WHERE id = $${Object.keys(updateData).length + 1} RETURNING *`,
+      values: [...Object.values(updateData), id]
+    };
+
+    try {
+      const result = await client.query(query);
+      res.status(200).json(result.rows[0]);
+    } catch (error) {
+      console.error('Error updating feedback:', error.message);
+      res.status(500).json({ error: error.message });
+    }
+  });
   
   
   app.get('/api/historical-data', async (req, res) => {
@@ -258,12 +277,22 @@ app.get('/api/user-details/:userId', async (req, res) => {
   });
   
   app.post('/api/routes', async (req, res) => {
-    const { route } = req.body;
-    const query = 'INSERT INTO routes (route) VALUES ($1) RETURNING *';
-    const values = [route];
+    const routeData = req.body;
+    let fields = [];
+    let values = [];
+    let i = 1;
+  
+    for (let field in routeData) {
+      fields.push(field);
+      values.push(`$${i}`);
+      i++;
+    }
+  
+    const query = `INSERT INTO routes (${fields.join(', ')}) VALUES (${values.join(', ')}) RETURNING *`;
+    const valueParams = Object.values(routeData);
   
     try {
-      const result = await client.query(query, values);
+      const result = await client.query(query, valueParams);
       res.status(200).json(result.rows[0]);
     } catch (error) {
       console.error('Error creating route:', error.message);
