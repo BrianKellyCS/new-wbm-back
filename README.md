@@ -43,7 +43,8 @@ CREATE TABLE feedbacks (
   title TEXT NULL,
   description TEXT NULL,
   assigned_to SMALLINT NULL,
-  completed BOOLEAN NULL,
+  addressed BOOLEAN NOT NULL DEFAULT false,
+  addressed_date TIMESTAMPTZ NULL,
   timestamp TIMESTAMPTZ NOT NULL DEFAULT now(),
   devicetype VARCHAR NULL
 );
