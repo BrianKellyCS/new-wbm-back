@@ -262,6 +262,25 @@ app.get('/api/user-details/:userId', async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   });
+
+
+  app.put('/api/update-device-software', async (req, res) => {
+    const { id, updateData, tableName } = req.body;
+  
+    const fields = Object.keys(updateData).map((key, idx) => `${key} = $${idx + 1}`).join(', ');
+    const values = Object.values(updateData);
+    values.push(id);
+  
+    const query = `UPDATE ${tableName} SET ${fields} WHERE unique_id = $${values.length} RETURNING *`;
+  
+    try {
+      const result = await client.query(query, values);
+      res.status(200).json({ data: result.rows[0], error: null });
+    } catch (error) {
+      console.error('Error updating device info:', error.message);
+      res.status(500).json({ error: error.message });
+    }
+  });
   
   
   app.get('/api/recent-routes', async (req, res) => {
@@ -331,7 +350,7 @@ app.get('/api/user-details/:userId', async (req, res) => {
     }
   });
   
-  app.put('/api/update-device', async (req, res) => {
+  app.put('/api/update-device-hardware', async (req, res) => {
     const { unique_id, updateFields } = req.body;
     let setClause = [];
     let values = [];
