@@ -53,7 +53,9 @@ CREATE TABLE historical (
   id SERIAL NOT NULL PRIMARY KEY,
   unique_id INTEGER NOT NULL,
   level_in_percents SMALLINT NULL,
-  saved_time TIMESTAMPTZ NULL DEFAULT current_timestamp
+  saved_time TIMESTAMPTZ NULL DEFAULT current_timestamp,
+  temp DOUBLE PRECISION NULL,
+  humidity DOUBLE PRECISION NULL
 );
 
 CREATE TABLE users (
